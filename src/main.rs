@@ -17,7 +17,11 @@ struct Fasta {
 
 impl std::fmt::Display for Fasta {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{} {}", &self.name, &self.sequence[0..31])
+        if self.sequence.len() > 30 {
+            write!(f, "{} {}", &self.name, &self.sequence[0..31])
+        } else {
+            write!(f, "{} {}", &self.name, &self.sequence)
+        }
     }
 }
 
@@ -61,6 +65,35 @@ impl Fastq {
         output_file.write_all("\n".as_bytes()).unwrap();
         output_file.write_all(&self.quality.as_bytes()).unwrap();
         output_file.write_all("\n".as_bytes()).unwrap();
+    }
+}
+
+/// FastaIterator
+struct FastaIterator {
+    n: usize,
+    handle: Box<dyn BufRead>,
+}
+
+impl FastaIterator {
+    fn new(handle: Box<dyn BufRead>) -> FastaIterator {
+        FastaIterator { n: 0, handle: handle }
+    }
+}
+
+impl Iterator for FastaIterator {
+    type Item = Fasta;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.n += 1;
+
+        if self.n <= 5 {
+            Some(Fasta {
+                name: ">test_1".to_string(),
+                sequence: "ACTG".to_string(),
+            })
+        } else {
+            None
+        }
     }
 }
 
@@ -134,6 +167,16 @@ fn main() -> io::Result<()> {
     let outfastqgz = writer(&(filename.to_owned() + ".gz"));
     fastq.write_to_file(outfastq);
     fastq.write_to_file(outfastqgz);
+
+    // Testing FastaIterator
+    let filename = "test.fasta";
+    let handle = reader(filename);
+    let mut fasta_sequences = FastaIterator::new(handle);
+    for s in fasta_sequences.into_iter() {
+        println!("Sequence from FastaIterator: {}", s);
+    }
+
+    // Testing fastq_iterator
 
     Ok(())
 }
