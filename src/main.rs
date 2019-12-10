@@ -7,7 +7,56 @@ use std::fs::File;
 use std::io::{self, BufRead, BufReader, BufWriter, Write};
 use std::path::Path;
 
-// Classes
+// Structs
+/// Fasta sequence
+#[derive(Clone, Hash, Debug)]
+struct Fasta {
+    name: String,
+    sequence: String,
+}
+
+impl std::fmt::Display for Fasta {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{} {}", &self.name, &self.sequence[0..31])
+    }
+}
+
+impl Fasta {
+    pub fn write_to_file(&self, mut output_file: Box<dyn Write>) {
+        output_file.write_all(&self.name.as_bytes()).unwrap();
+        output_file.write_all("\n".as_bytes()).unwrap();
+        output_file.write_all(&self.sequence.as_bytes()).unwrap();
+        output_file.write_all("\n".as_bytes()).unwrap();
+    }
+}
+
+/// Fastq sequence
+#[derive(Clone, Hash, Debug)]
+struct Fastq {
+    name: String,
+    sequence: String,
+    name2: String,
+    quality: String,
+}
+
+impl std::fmt::Display for Fastq {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "{} {} {}", &self.name, &self.sequence[0..31], &self.quality[0..31])
+    }
+}
+
+impl Fastq {
+    pub fn write_to_file(&self, mut output_file: Box<dyn Write>) {
+        output_file.write_all(&self.name.as_bytes()).unwrap();
+        output_file.write_all("\n".as_bytes()).unwrap();
+        output_file.write_all(&self.sequence.as_bytes()).unwrap();
+        output_file.write_all("\n".as_bytes()).unwrap();
+        output_file.write_all(&self.name2.as_bytes()).unwrap();
+        output_file.write_all("\n".as_bytes()).unwrap();
+        output_file.write_all(&self.quality.as_bytes()).unwrap();
+        output_file.write_all("\n".as_bytes()).unwrap();
+    }
+}
 
 // Functions
 /// Read normal or compressed files seamlessly
@@ -52,41 +101,33 @@ pub fn writer(filename: &str) -> Box<dyn Write> {
 
 /// Doing tests
 fn main() -> io::Result<()> {
-    /*
-    // Test with uncompressed file
-    let filename = "file.txt";
-    println!("Testing reader with uncompressed file: '{}'", filename);
-    let reader_file = reader(filename);
-    for line in reader_file.lines() {
-        println!("{}", line?);
-    }
-    println!();
+    // Test Fasta
+    let fasta = Fasta {
+        name: ">sequence_1".to_string(),
+        sequence: "ACTG".repeat(10).to_string(),
+    };
+    println!("Fasta sequence: {}", fasta);
 
-    // Test with compressed file
-    let filename = "file.txt.gz";
-    println!("Testing reader with compressed file: '{}'", filename);
-    let reader_file_gz = reader(filename);
-    for line in reader_file_gz.lines() {
-        println!("{}", line?);
-    }
-    println!();
+    let filename = "output.fasta";
+    let outfasta = writer(filename);
+    let outfastagz = writer(&(filename.to_owned() + ".gz"));
+    fasta.write_to_file(outfasta);
+    fasta.write_to_file(outfastagz);
 
-    // Test writing to uncompressed file
-    let filename = "file.output.txt";
-    println!("Testing writer with compressed file: '{}'", filename);
-    let mut writer_file = writer(filename);
-    for _i in 1..=100 {
-        writer_file.write_all(b"This is the end. Count your chickens.\n")?;
-    }
+    // Test Fastq
+    let fastq = Fastq {
+        name: "@sequence_1".to_string(),
+        sequence: "ACTG".repeat(10).to_string(),
+        name2: "+".to_string(),
+        quality: "!ABC".repeat(10).to_string(),
+    };
+    println!("Fastq sequence: {}", fastq);
 
-    // Test writing to compressed file
-    let filename = "file.output.txt.gz";
-    println!("Testing writer with compressed file: '{}'", filename);
-    let mut writer_file = writer(filename);
-    for _i in 1..=100 {
-        writer_file.write_all(b"This is the end. Count your chickens.\n")?;
-    }
-    */
+    let filename = "output.fastq";
+    let outfastq = writer(filename);
+    let outfastqgz = writer(&(filename.to_owned() + ".gz"));
+    fastq.write_to_file(outfastq);
+    fastq.write_to_file(outfastqgz);
 
     Ok(())
 }
