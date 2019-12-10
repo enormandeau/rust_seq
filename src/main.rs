@@ -84,6 +84,10 @@ impl Iterator for FastaIterator {
     type Item = Fasta;
 
     fn next(&mut self) -> Option<Self::Item> {
+        for line in self.handle.lines() {
+            println!("{}", line?);
+        }
+
         self.n += 1;
 
         if self.n <= 5 {
@@ -171,9 +175,15 @@ fn main() -> io::Result<()> {
     // Testing FastaIterator
     let filename = "test.fasta";
     let handle = reader(filename);
-    let mut fasta_sequences = FastaIterator::new(handle);
+    /*
+    for line in handle.lines() {
+        println!("{}", line?);
+    }
+    */
+
+    let fasta_sequences = FastaIterator::new(handle);
     for s in fasta_sequences.into_iter() {
-        println!("Sequence from FastaIterator: {}", s);
+        println!("Sequence from iterator: {}", s);
     }
 
     // Testing fastq_iterator
