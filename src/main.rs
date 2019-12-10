@@ -41,7 +41,13 @@ struct Fastq {
 
 impl std::fmt::Display for Fastq {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "{} {} {}", &self.name, &self.sequence[0..31], &self.quality[0..31])
+        write!(
+            f,
+            "{} {} {}",
+            &self.name,
+            &self.sequence[0..31],
+            &self.quality[0..31]
+        )
     }
 }
 
