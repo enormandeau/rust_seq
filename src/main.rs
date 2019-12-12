@@ -7,7 +7,10 @@ use std::fs::File;
 use std::io::{self, BufRead, BufReader, BufWriter, Write};
 use std::path::Path;
 
-// Structs
+extern crate bio;
+use bio::io::fasta;
+//use bio::io::fastq;
+
 /// Fasta sequence
 #[derive(Clone, Hash, Debug)]
 struct Fasta {
@@ -68,38 +71,6 @@ impl Fastq {
     }
 }
 
-/// FastaIterator
-struct FastaIterator {
-    n: usize,
-    handle: Box<dyn BufRead>,
-}
-
-impl FastaIterator {
-    fn new(handle: Box<dyn BufRead>) -> FastaIterator {
-        FastaIterator { n: 0, handle: handle }
-    }
-}
-
-impl Iterator for FastaIterator {
-    type Item = Fasta;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        for line in self.handle.lines() {
-            println!("{}", line?);
-        }
-
-        self.n += 1;
-
-        if self.n <= 5 {
-            Some(Fasta {
-                name: ">test_1".to_string(),
-                sequence: "ACTG".to_string(),
-            })
-        } else {
-            None
-        }
-    }
-}
 
 // Functions
 /// Read normal or compressed files seamlessly
@@ -172,21 +143,18 @@ fn main() -> io::Result<()> {
     fastq.write_to_file(outfastq);
     fastq.write_to_file(outfastqgz);
 
-    // Testing FastaIterator
-    let filename = "test.fasta";
-    let handle = reader(filename);
-    /*
-    for line in handle.lines() {
-        println!("{}", line?);
-    }
-    */
+    // Testing Rust-Bio
+    let input_filename = "test.fasta.gz";
+    let output_filename = "test.out.fasta.gz";
+    let infile = reader(input_filename);
+    let outfile = writer(input_filename);
 
-    let fasta_sequences = FastaIterator::new(handle);
-    for s in fasta_sequences.into_iter() {
-        println!("Sequence from iterator: {}", s);
-    }
+    let sequences = fasta::Reader::new(infile);
 
-    // Testing fastq_iterator
+    for seq in sequences.records() {
+        println!("{:?}", seq.unwrap());
+        //println!("{}", seq.unwrap().id());
+    }
 
     Ok(())
 }
