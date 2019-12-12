@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+#![allow(unused_variables)]
 use flate2::read;
 use flate2::write;
 use flate2::Compression;
@@ -13,7 +15,7 @@ use bio::io::fasta;
 
 /// Fasta sequence
 #[derive(Clone, Hash, Debug)]
-struct Fasta {
+pub struct Fasta {
     name: String,
     sequence: String,
 }
@@ -39,7 +41,7 @@ impl Fasta {
 
 /// Fastq sequence
 #[derive(Clone, Hash, Debug)]
-struct Fastq {
+pub struct Fastq {
     name: String,
     sequence: String,
     name2: String,
@@ -70,7 +72,6 @@ impl Fastq {
         output_file.write_all("\n".as_bytes()).unwrap();
     }
 }
-
 
 // Functions
 /// Read normal or compressed files seamlessly
@@ -103,7 +104,6 @@ pub fn writer(filename: &str) -> Box<dyn Write> {
     };
 
     if path.extension() == Some(OsStr::new("gz")) {
-        // Error is here: Created file isn't gzip-compressed
         Box::new(BufWriter::with_capacity(
             128 * 1024,
             write::GzEncoder::new(file, Compression::default()),
@@ -115,20 +115,42 @@ pub fn writer(filename: &str) -> Box<dyn Write> {
 
 /// Doing tests
 fn main() -> io::Result<()> {
-    // Test Fasta
+    // Read from file and print to screen
+    // fasta
+    println!("### Read from fasta file:");
+    let filename = "input.fasta";
+    let infile = reader(filename);
+    for line in infile.lines() {
+        println!("{}", line.unwrap());
+    }
+    println!("");
+
+    // fasta.gz
+    println!("### Read from fasta.gz file:");
+    let filename = "input.fasta.gz";
+    let infile = reader(filename);
+    for line in infile.lines() {
+        println!("{}", line.unwrap());
+    }
+    println!("");
+
+    // Write to file
     let fasta = Fasta {
         name: ">sequence_1".to_string(),
         sequence: "ACTG".repeat(10).to_string(),
     };
-    println!("Fasta sequence: {}", fasta);
 
+    println!("### Write to fasta and fasta.gz file:");
+    println!("Fasta sequence: {}", fasta);
     let filename = "output.fasta";
     let outfasta = writer(filename);
-    let outfastagz = writer(&(filename.to_owned() + ".gz"));
+    let outfastagz = writer(&(filename.to_string() + ".gz"));
     fasta.write_to_file(outfasta);
     fasta.write_to_file(outfastagz);
 
     // Test Fastq
+    // Read from file
+    // Write to file
     let fastq = Fastq {
         name: "@sequence_1".to_string(),
         sequence: "ACTG".repeat(10).to_string(),
@@ -137,23 +159,29 @@ fn main() -> io::Result<()> {
     };
     println!("Fastq sequence: {}", fastq);
 
-    let filename = "output.fastq";
-    let outfastq = writer(filename);
-    let outfastqgz = writer(&(filename.to_owned() + ".gz"));
-    fastq.write_to_file(outfastq);
-    fastq.write_to_file(outfastqgz);
-
+    //
+    //
+    //
+    //
     // Testing Rust-Bio
-    let input_filename = "test.fasta.gz";
-    let output_filename = "test.out.fasta.gz";
-    let infile = reader(input_filename);
-    let outfile = writer(input_filename);
+    //
+    //
+    //
+    //
+    let input_filename = "input.fasta";
+    let output_filename = "output_rust-bio.fasta.gz";
+    let mut outfile = writer(output_filename);
 
-    let sequences = fasta::Reader::new(infile);
+    let sequences = fasta::Reader::from_file(input_filename).unwrap();
+
+    //let infile = reader(input_filename);
+    //let sequences = fasta::Reader::new(input_filename).unwrap();
 
     for seq in sequences.records() {
-        println!("{:?}", seq.unwrap());
-        //println!("{}", seq.unwrap().id());
+        let s = seq.unwrap().clone();
+        println!("{:?}", s.id());
+        println!("{:?}", s);
+        outfile.write_all((s.id().to_string() + "\n").as_bytes())?;
     }
 
     Ok(())
