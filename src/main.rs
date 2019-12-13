@@ -159,6 +159,8 @@ fn main() -> io::Result<()> {
     };
     println!("Fastq sequence: {}", fastq);
 
+    // TODO Try niffler !!!
+
     //
     //
     //
