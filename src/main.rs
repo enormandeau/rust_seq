@@ -11,7 +11,7 @@ use std::path::Path;
 
 extern crate bio;
 use bio::io::fasta;
-//use bio::io::fastq;
+use bio::io::fastq;
 
 /// Fasta sequence
 #[derive(Clone, Hash, Debug)]
@@ -157,34 +157,49 @@ fn main() -> io::Result<()> {
         name2: "+".to_string(),
         quality: "!ABC".repeat(10).to_string(),
     };
-    println!("Fastq sequence: {}", fastq);
+    println!("Fastq sequence: {}\n", fastq);
 
-    // TODO Try niffler !!!
+    // Rust-Bio
+    // Fasta
+    // Input
+    println!("### Read from Fasta file with Rust-Bio");
+    let input_filename = "input.fasta.gz";
+    let infile = reader(input_filename);
+    let sequences = fasta::Reader::new(infile);
 
-    //
-    //
-    //
-    //
-    // Testing Rust-Bio
-    //
-    //
-    //
-    //
-    let input_filename = "input.fasta";
+    // Output
     let output_filename = "output_rust-bio.fasta.gz";
-    let mut outfile = writer(output_filename);
-
-    let sequences = fasta::Reader::from_file(input_filename).unwrap();
-
-    //let infile = reader(input_filename);
-    //let sequences = fasta::Reader::new(input_filename).unwrap();
+    let outfile = writer(output_filename);
+    let mut outwriter = fasta::Writer::new(outfile);
 
     for seq in sequences.records() {
         let s = seq.unwrap().clone();
         println!("{:?}", s.id());
         println!("{:?}", s);
-        outfile.write_all((s.id().to_string() + "\n").as_bytes())?;
+        outwriter.write_record(&s)?;
     }
+    println!();
+
+    // Rust-Bio
+    // Fastq
+    // Input
+    println!("### Read from Fastq file with Rust-Bio");
+    let input_filename = "input.fastq";
+    let infile = reader(input_filename);
+    let sequences = fastq::Reader::new(infile);
+
+    // Output
+    let output_filename = "output_rust-bio.fastq.gz";
+    let outfile = writer(output_filename);
+    let mut outwriter = fastq::Writer::new(outfile);
+
+    for seq in sequences.records() {
+        let s = seq.unwrap().clone();
+        println!("{:?}", s.id());
+        println!("{:?}", s);
+        outwriter.write_record(&s)?;
+    }
+    println!();
 
     Ok(())
 }
