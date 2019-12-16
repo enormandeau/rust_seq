@@ -53,7 +53,7 @@ pub fn writer(filename: &str) -> Box<dyn Write> {
 
 // TODO debug return type/trait
 // Add a fasta_reader, fastq_reader, fasta_writer, and fastq_writer
-pub fn fasta_reader(filename: &str) -> Box<dyn fasta::Read + 'static> {
+pub fn fasta_reader(filename: &str) -> Box<dyn fasta::Read> {
     println!("### Read from Fasta file with Rust-Bio using fasta_reader");
     let infile = reader(filename);
     let sequences = fasta::Reader::new(infile);
