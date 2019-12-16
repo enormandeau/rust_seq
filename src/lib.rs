@@ -80,7 +80,9 @@ pub fn fastq_writer(filename: &str) -> fastq::Writer<Box<dyn Write>> {
 }
 
 /// Doing tests
-fn main() -> io::Result<()> {
+mod tests {
+    #[test]
+    fn everything_is_ok {
     // Rust-Bio
     // Fasta
     // Input
@@ -118,6 +120,4 @@ fn main() -> io::Result<()> {
         outwriter.write_record(&s)?;
     }
     println!();
-
-    Ok(())
 }
