@@ -51,8 +51,32 @@ pub fn writer(filename: &str) -> Box<dyn Write> {
     }
 }
 
-// Add a fasta_reader, fastq_reader, fasta_writer, and fastq_writer
+// Reading Fasta
 pub fn fasta_reader(filename: &str) -> fasta::Reader<Box<dyn io::BufRead>> {
+    println!("### Read from Fasta file with Rust-Bio using fasta_reader");
+    let infile = reader(filename);
+    let sequences = fasta::Reader::new(infile);
+    sequences
+}
+
+// Reading Fastq
+pub fn fastq_reader(filename: &str) -> fastq::Reader<Box<dyn io::BufRead>> {
+    println!("### Read from Fasta file with Rust-Bio using fasta_reader");
+    let infile = reader(filename);
+    let sequences = fastq::Reader::new(infile);
+    sequences
+}
+
+// Writing Fasta
+pub fn fasta_writer(filename: &str) -> fasta::Reader<Box<dyn io::BufRead>> {
+    println!("### Read from Fasta file with Rust-Bio using fasta_reader");
+    let infile = reader(filename);
+    let sequences = fasta::Reader::new(infile);
+    sequences
+}
+
+// Writing Fastq
+pub fn fastq_writer(filename: &str) -> fasta::Reader<Box<dyn io::BufRead>> {
     println!("### Read from Fasta file with Rust-Bio using fasta_reader");
     let infile = reader(filename);
     let sequences = fasta::Reader::new(infile);
@@ -66,7 +90,7 @@ fn main() -> io::Result<()> {
     // Input
     println!("### Read from Fasta file with Rust-Bio");
     let input_filename = "input.fasta.gz";
-    let sequences = fasta_reader(&input_filename);
+    let sequences = fasta_reader(input_filename);
 
     // Output
     let output_filename = "output_rust-bio.fasta.gz";
@@ -86,8 +110,7 @@ fn main() -> io::Result<()> {
     // Input
     println!("### Read from Fastq file with Rust-Bio");
     let input_filename = "input.fastq.gz";
-    let infile = reader(input_filename);
-    let sequences = fastq::Reader::new(infile);
+    let sequences = fastq_reader(input_filename);
 
     // Output
     let output_filename = "output_rust-bio.fastq.gz";
