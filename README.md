@@ -2,6 +2,14 @@
 
 Provide fasta/fastq read/write from standard/compressed files
 
+## Using
+
+Add the following line to `Cargo.toml`:
+
+```Rust
+rust_seq = { git = "https://github.com/enormandeau/rust_seq" }
+```
+
 ## Example
 
 ```Rust
