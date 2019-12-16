@@ -4,7 +4,7 @@ use flate2::Compression;
 use std::error::Error;
 use std::ffi::OsStr;
 use std::fs::File;
-use std::io::{self, BufRead, BufReader, BufWriter, Write};
+use std::io::{BufRead, BufReader, BufWriter, Write};
 use std::path::Path;
 
 extern crate bio;
