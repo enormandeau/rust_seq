@@ -82,7 +82,7 @@ pub fn fastq_writer(filename: &str) -> fastq::Writer<Box<dyn Write>> {
 /// Doing tests
 mod tests {
     #[test]
-    fn everything_is_ok {
+    fn everything_is_ok() {
         // Rust-Bio
         // Fasta
         // Input
