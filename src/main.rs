@@ -52,34 +52,30 @@ pub fn writer(filename: &str) -> Box<dyn Write> {
 }
 
 // Reading Fasta
-pub fn fasta_reader(filename: &str) -> fasta::Reader<Box<dyn io::BufRead>> {
-    println!("### Read from Fasta file with Rust-Bio using fasta_reader");
+pub fn fasta_reader(filename: &str) -> fasta::Reader<Box<dyn BufRead>> {
     let infile = reader(filename);
     let sequences = fasta::Reader::new(infile);
     sequences
 }
 
 // Reading Fastq
-pub fn fastq_reader(filename: &str) -> fastq::Reader<Box<dyn io::BufRead>> {
-    println!("### Read from Fasta file with Rust-Bio using fasta_reader");
+pub fn fastq_reader(filename: &str) -> fastq::Reader<Box<dyn BufRead>> {
     let infile = reader(filename);
     let sequences = fastq::Reader::new(infile);
     sequences
 }
 
 // Writing Fasta
-pub fn fasta_writer(filename: &str) -> fasta::Reader<Box<dyn io::BufRead>> {
-    println!("### Read from Fasta file with Rust-Bio using fasta_reader");
-    let infile = reader(filename);
-    let sequences = fasta::Reader::new(infile);
+pub fn fasta_writer(filename: &str) -> fasta::Writer<Box<dyn Write>> {
+    let infile = writer(filename);
+    let sequences = fasta::Writer::new(infile);
     sequences
 }
 
 // Writing Fastq
-pub fn fastq_writer(filename: &str) -> fasta::Reader<Box<dyn io::BufRead>> {
-    println!("### Read from Fasta file with Rust-Bio using fasta_reader");
-    let infile = reader(filename);
-    let sequences = fasta::Reader::new(infile);
+pub fn fastq_writer(filename: &str) -> fastq::Writer<Box<dyn Write>> {
+    let infile = writer(filename);
+    let sequences = fastq::Writer::new(infile);
     sequences
 }
 
@@ -94,8 +90,7 @@ fn main() -> io::Result<()> {
 
     // Output
     let output_filename = "output_rust-bio.fasta.gz";
-    let outfile = writer(output_filename);
-    let mut outwriter = fasta::Writer::new(outfile);
+    let mut outwriter = fasta_writer(output_filename);
 
     for seq in sequences.records() {
         let s = seq.unwrap().clone();
@@ -114,8 +109,7 @@ fn main() -> io::Result<()> {
 
     // Output
     let output_filename = "output_rust-bio.fastq.gz";
-    let outfile = writer(output_filename);
-    let mut outwriter = fastq::Writer::new(outfile);
+    let mut outwriter = fastq_writer(output_filename);
 
     for seq in sequences.records() {
         let s = seq.unwrap().clone();
